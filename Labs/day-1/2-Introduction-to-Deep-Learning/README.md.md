@@ -26,16 +26,6 @@ A neural network is a collection of layers that take input data, perform computa
 ### What is a Perceptron?
 A perceptron is the simplest type of neural unit. It takes inputs, multiplies each by a **weight**, adds a **bias**, and applies an **activation function**.
 
-### ⚙️ Equation:
-\[
-\text{Output} = f(w_1x_1 + w_2x_2 + \dots + w_nx_n + b)
-\]
-Where:
-- \( x_i \) = inputs  
-- \( w_i \) = weights  
-- \( b \) = bias  
-- \( f \) = activation function
-
 ---
 
 ### 💡 Example:
@@ -49,33 +39,20 @@ def simple_perceptron(x1, x2):
     return output
 ```
 
-If a student studied for 5 hours and slept well (score 8), the output would be:
-\[
-0.6 \times 5 + 0.4 \times 8 + 1 = 3 + 3.2 + 1 = 7.2
-\]
-
 ---
 
 ## 🎚️ Section 4: Activation Functions
 
 Activation functions determine whether a neuron "fires" or not. They introduce **non-linearity**, allowing networks to learn complex patterns.
 
-### Common Activation Functions:
-
-| Function        | Formula                                | Use Case                      |
-|----------------|-----------------------------------------|-------------------------------|
-| Sigmoid         | \( \frac{1}{1+e^{-x}} \)               | Probabilities, binary output |
-| ReLU (Rectified Linear Unit) | \( \max(0,x) \)           | Most modern networks          |
-| Tanh            | \( \tanh(x) \)                         | Classification, regression    |
-| Softmax         | Converts vector to probabilities       | Multi-class classification    |
-
+| Function                         | Formula                                                 | Use Case                     |
+| -------------------------------- | ------------------------------------------------------- | ---------------------------- |
+| **Sigmoid**                      | $\displaystyle \frac{1}{1 + e^{-x}}$                    | Probabilities, binary output |
+| **ReLU (Rectified Linear Unit)** | $\max(0, x)$                                            | Most modern networks         |
+| **Tanh**                         | $\tanh(x)$                                              | Classification, regression   |
+| **Softmax**                      | $\displaystyle \frac{e^{x_i}}{\sum_j e^{x_j}}$ (vector) | Multi-class classification   |
 ---
 
-### 🔍 Why Non-Linearity Is Important?
-
-Without activation functions, neural networks become just a linear equation. That’s too limited! Real-world problems are non-linear—think about predicting weather, stock prices, or emotions.
-
----
 
 ## 🧠 Section 5: Designing a Neural Network – Step-by-Step
 
@@ -119,6 +96,16 @@ model.compile(optimizer='adam',
 
 # Train
 model.fit(x_train, y_train, epochs=5)
+
+# Predict on test set
+predictions = model.predict(x_test)
+
+# Convert predictions from probabilities to class labels
+predicted_classes = np.argmax(predictions, axis=1)
+
+# Print first 10 predictions vs actual labels
+print("Predicted classes:", predicted_classes[:10])
+print("Actual classes:   ", y_test[:10])
 ```
 
 ---
@@ -129,12 +116,12 @@ Loss functions measure how far off the model’s prediction is from the actual v
 
 ### Common Loss Functions:
 
-| Type              | Function              | When to Use                        |
-|-------------------|-----------------------|-------------------------------------|
-| Mean Squared Error (MSE) | \[ \frac{1}{n}\sum(y - \hat{y})^2 \] | Regression problems                |
-| Binary Crossentropy | \[ -y\log(\hat{y}) - (1-y)\log(1-\hat{y}) \] | Binary classification              |
-| Categorical Crossentropy | Similar to binary but for multiple classes | Multi-class classification        |
-| Hinge Loss         | Used in SVMs         | Margin-based classification         |
+| Type                         | Function                                                  | When to Use                              |
+| ---------------------------- | --------------------------------------------------------- | ---------------------------------------- |
+| **Mean Squared Error (MSE)** | $\frac{1}{n} \sum_{i=1}^n (y_i - \hat{y}_i)^2$            | Regression problems                      |
+| **Binary Crossentropy**      | $-y \log(\hat{y}) - (1 - y) \log(1 - \hat{y})$            | Binary classification                    |
+| **Categorical Crossentropy** | $-\sum_{c=1}^C y_c \log(\hat{y}_c)$ (extension of binary) | Multi-class classification               |
+| **Hinge Loss**               | $\max(0, 1 - y \cdot \hat{y})$                            | Margin-based classification (e.g., SVMs) |
 
 ---
 
@@ -160,12 +147,16 @@ Imagine you're hiking downhill blindfolded. You feel the slope and take small st
 
 ### 🔍 Update Rule (Gradient Descent):
 
-\[
+
+$$
 w = w - \alpha \times \frac{\partial L}{\partial w}
-\]
+$$
+
 Where:
-- \( \alpha \) = learning rate
-- \( \frac{\partial L}{\partial w} \) = derivative of loss w.r.t. weight
+
+* $\alpha$ = learning rate
+* $\frac{\partial L}{\partial w}$ = derivative of the loss $L$ with respect to weight $w$
+
 
 ---
 
@@ -223,34 +214,3 @@ Image classification (cats vs. dogs), facial recognition
 | Examples        | Email spam filter    | Facial recognition       | Language translation      |
 
 ---
-
-## 🔬 Section 10: Deep Learning Challenges & Solutions
-
-### ⚠️ Challenges:
-- Requires lots of labeled data
-- High computation cost
-- Risk of overfitting
-
-### ✅ Solutions:
-- Use **regularization** (Dropout, L2)
-- **Data augmentation** for images
-- **Transfer learning** with pre-trained models
-
----
-
-## 🧪 Section 11: Suggested Hands-on Exercises
-
-1. Create a perceptron that predicts pass/fail from study hours.
-2. Visualize a sigmoid and ReLU activation curve.
-3. Compare CNN vs. FNN performance on image data.
-4. Use RNN to generate text character-by-character.
-5. Build an image classifier with real photos using Keras.
-
----
-
-## 📌 Section 12: Key Takeaways
-
-- Neural networks are the heart of deep learning.
-- Activation functions allow non-linear learning.
-- Loss functions measure performance; optimizers help improve.
-- CNNs are best for images, RNNs for sequences, FNNs for general predictions.

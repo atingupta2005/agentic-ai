@@ -1,248 +1,174 @@
-# 🏭 Lab: Building a Simple AI Agent Using LangChain
+# %% [markdown]
+# # 🚀 Advanced AI Agent with LangChain
+# *Fully self-contained Jupyter Notebook*
+# 
+# **Features:**
+# - Wikipedia search tool
+# - Safe calculator
+# - Conversation memory
+# - Rich interactive interface
+# - Error handling
+# 
+# *No external files needed - runs entirely in this notebook*
 
-## Lab Objectives
-By the end of this lab, you will:
-1. Set up a Python environment with LangChain and an LLM provider (OpenAI).
-2. Implement a custom “Wikipedia Search” tool.
-3. Instantiate a LangChain agent that dynamically chooses tools.
-4. Interact with your agent in a REPL loop.
-5. Extend the agent with memory to preserve context.
+# %% [markdown]
+# ## 1️⃣ Environment Setup
 
----
+# %%
+# Install required packages (run this first)
+!pip install -q langchain==0.1.14 openai==1.12.0 python-dotenv==1.0.0 
+!pip install -q requests==2.31.0 wikipedia==1.4.0 langchain-community==0.0.27
+!pip install -q rich==13.7.0 tiktoken==0.6.0
 
-## Prerequisites
-- Python 3.8+  
-- An OpenAI API key (exported as `OPENAI_API_KEY`)  
-- Basic familiarity with Python and REST APIs  
-- (Optional) Git installed for cloning examples
+# %%
+# @title 🔑 API Configuration
+import os
+from getpass import getpass
+from rich.console import Console
+from rich.panel import Panel
 
----
+console = Console()
 
-## Environment Setup
+# Get API key securely
+api_key = getpass("Enter your OpenAI API key: ")
+os.environ["OPENAI_API_KEY"] = api_key
 
-1. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate       # macOS/Linux
-   venv\Scripts\activate          # Windows PowerShell
-   ```
+console.print(Panel.fit("✅ Environment Ready!", style="bold green"))
 
-2. Install dependencies:
-   ```bash
-   pip install langchain openai requests python-dotenv
-   ```
+# %% [markdown]
+# ## 2️⃣ Tool Implementations
 
-3. In your project folder, create a file `.env` containing:
-   ```
-   OPENAI_API_KEY=sk-XXXXXXXXXXXXXXXXXXXX
-   ```
+# %%
+# @title 🌐 Wikipedia Search Tool
+import requests
+from langchain.tools import Tool
+from typing import Optional
 
-4. Create a Python file `agent_lab.py` and add:
-   ```python
-   import os
-   from dotenv import load_dotenv
+def wiki_search(topic: str, lang: str = "en") -> Optional[str]:
+    """Enhanced Wikipedia search with error handling"""
+    headers = {"User-Agent": "MyAIAgent/1.0 (educational-use)"}
+    url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{topic}"
+    
+    try:
+        resp = requests.get(url, headers=headers, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+        return data.get("extract", "No summary available.")
+    except Exception as e:
+        print(f"⚠️ Wikipedia Error: {str(e)}")
+        return None
 
-   load_dotenv()
-   OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-   ```
+wiki_tool = Tool(
+    name="wikipedia",
+    func=wiki_search,
+    description="Access Wikipedia summaries. Input format: 'search_term lang_code'",
+    handle_tool_error=True
+)
 
----
+# Test
+wiki_search("LangChain")
 
-## Task 1: Implement the Wikipedia Search Tool
+# %%
+# @title ➗ Safe Calculator Tool
+import re
+from langchain.tools import BaseTool
 
-1. Add imports at top of `agent_lab.py`:
-   ```python
-   import requests
-   from langchain import Tool
-   ```
+class SafeCalculator(BaseTool):
+    name = "calculator"
+    description = """Evaluates math expressions. 
+    Only numbers and +-*/.() allowed. Example: '(3 + 5) * 2'"""
+    
+    def _run(self, expression: str) -> str:
+        if not re.fullmatch(r'^[\d\s+\-*\/\.\(\)]+$', expression):
+            return "❌ Invalid input - only basic math operations allowed"
+        try:
+            return str(eval(expression, {"__builtins__": None}, {}))
+        except Exception as e:
+            return f"⚠️ Calculation error: {str(e)}"
 
-2. Define a function to fetch a Wikipedia summary:
-   ```python
-   def wiki_search(topic: str) -> str:
-       url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{topic}"
-       resp = requests.get(url)
-       if resp.status_code != 200:
-           return "No article found."
-       data = resp.json()
-       return data.get("extract", "No summary available.")
-   ```
+calc_tool = SafeCalculator()
 
-3. Wrap it as a LangChain Tool:
-   ```python
-   wiki_tool = Tool(
-       name="wiki_search",
-       func=wiki_search,
-       description="Use this tool to get a summary of any Wikipedia topic."
-   )
-   ```
+# Test
+calc_tool.run("(5 + 3) * 2")
 
-4. Test the tool:
-   ```python
-   if __name__ == "__main__":
-       print(wiki_search("LangChain"))
-   ```
+# %% [markdown]
+# ## 3️⃣ Agent Initialization
 
----
+# %%
+# @title 🧠 Initialize LLM & Memory
+from langchain.chat_models import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
 
-## Task 2: Initialize the LLM
+llm = ChatOpenAI(
+    model_name="gpt-3.5-turbo",
+    temperature=0.3,
+    streaming=True
+)
 
-1. Import and instantiate an OpenAI LLM wrapper:
-   ```python
-   from langchain.llms import OpenAI
+memory = ConversationBufferMemory(
+    memory_key="chat_history",
+    return_messages=True
+)
 
-   llm = OpenAI(
-       temperature=0.2,
-       openai_api_key=OPENAI_API_KEY
-   )
-   ```
+# %%
+# @title 🤖 Build the Agent
+from langchain.agents import initialize_agent, AgentType
 
-2. Test a basic prompt:
-   ```python
-   if __name__ == "__main__":
-       print(llm("Explain LangChain in one sentence."))
-   ```
+agent = initialize_agent(
+    tools=[wiki_tool, calc_tool],
+    llm=llm,
+    agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+    memory=memory,
+    verbose=True,
+    handle_parsing_errors=True,
+    max_iterations=3
+)
 
----
+# %% [markdown]
+# ## 4️⃣ Interactive Chat Interface
 
-## Task 3: Create and Run the Agent
+# %%
+# @title 💬 Run the Agent (Interactive Mode)
+from rich.markdown import Markdown
+from IPython.display import display, clear_output
+import ipywidgets as widgets
 
-1. Import the agent initializer:
-   ```python
-   from langchain import initialize_agent, AgentType
-   ```
+output = widgets.Output()
+text_input = widgets.Text(
+    placeholder='Type your question here...',
+    layout=widgets.Layout(width='80%')
+submit_button = widgets.Button(description="Ask")
 
-2. Instantiate a zero-shot agent with your tool:
-   ```python
-   agent = initialize_agent(
-       tools=[wiki_tool],
-       llm=llm,
-       agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-       verbose=True
-   )
-   ```
+def on_submit(_):
+    with output:
+        clear_output()
+        query = text_input.value
+        if query.lower() in ('exit', 'quit'):
+            print("👋 Ending conversation...")
+            return
+            
+        print(f"🧑 You: {query}")
+        try:
+            response = agent({"input": query})
+            display(Markdown(f"🤖 **Agent**: {response['output']}"))
+        except Exception as e:
+            print(f"⚠️ Error: {str(e)}")
+        text_input.value = ''  # Clear input
 
-3. Add an interactive REPL loop at the bottom:
-   ```python
-   if __name__ == "__main__":
-       while True:
-           query = input("\nEnter your question (or 'exit'): ")
-           if query.lower() == "exit":
-               break
-           print(agent.run(query))
-   ```
+submit_button.on_click(on_submit)
+display(widgets.VBox([text_input, submit_button, output]))
 
-4. Run the agent:
-   ```bash
-   python agent_lab.py
-   ```
-   - **Try queries**:  
-     - “What is the capital of France?”  
-     - “Tell me about the Mars Rover.”
+# %% [markdown]
+# ## 5️⃣ Sample Queries to Try
+# ```
+# What is LangChain?
+# Tell me about Paris in French (use "Paris fr")
+# Calculate (25 * 4) + (18 / 3)
+# Who is Marie Curie? Then ask: What was her most famous discovery?
+# ```
 
----
-
-## Task 4: Add Conversation Memory
-
-1. Install a memory module:
-   ```bash
-   pip install langchain[embeddings]
-   ```
-
-2. Add imports and memory setup:
-   ```python
-   from langchain.memory import ConversationBufferMemory
-
-   memory = ConversationBufferMemory(memory_key="chat_history")
-   ```
-
-3. Re-initialize the agent with memory:
-   ```python
-   agent = initialize_agent(
-       tools=[wiki_tool],
-       llm=llm,
-       agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-       memory=memory,
-       verbose=True
-   )
-   ```
-
-4. Relaunch and observe that follow-up questions maintain context:
-   ```text
-   You: Who is Ada Lovelace?
-   Agent: Ada Lovelace is…
-   You: When did she live?
-   Agent: She lived from 1815 to 1852.
-   ```
-
----
-
-## Task 5: Extend with a Calculator Tool
-
-1. Define a simple calculator:
-   ```python
-   def calc(expression: str) -> str:
-       try:
-           return str(eval(expression, {}, {}))
-       except Exception:
-           return "Invalid calculation."
-   ```
-
-2. Wrap it as a tool:
-   ```python
-   calc_tool = Tool(
-       name="calculator",
-       func=calc,
-       description="Evaluate arithmetic expressions."
-   )
-   ```
-
-3. Reinitialize the agent with both tools:
-   ```python
-   agent = initialize_agent(
-       tools=[wiki_tool, calc_tool],
-       llm=llm,
-       agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-       memory=memory,
-       verbose=True
-   )
-   ```
-
-4. Test mixed queries:
-   ```text
-   You: What is 128 * 7?
-   Agent: 896
-   You: And who is Alan Turing?
-   Agent: …
-   ```
-
----
-
-## Lab Deliverables
-
-- `agent_lab.py` containing:
-  - Wikipedia search tool  
-  - Calculator tool  
-  - OpenAI LLM initializer  
-  - Agent with memory  
-  - REPL loop  
-- Screenshots or logs demonstrating:
-  - Tool calls (wiki and calculator)  
-  - Memory in follow-up queries  
-
----
-
-## Reflection Questions
-
-1. How does the agent decide which tool to invoke?  
-2. What are the benefits of adding memory to the agent?  
-3. How might you add error handling or retries for failed API calls?  
-4. Propose an additional tool (e.g., weather, stock prices) and sketch its implementation.
-
----
-
-## Next Steps & Extensions
-
-- Swap OpenAI for a local Hugging Face model backend.  
-- Persist memory in a Redis or SQL store.  
-- Build a multi-agent system: one agent scrapes data, another analyzes it.  
-- Integrate function-calling APIs (e.g., OpenAI Functions) for richer tool definitions.
+# %% [markdown]
+# ## 🛠️ Troubleshooting
+# - If you get API errors, verify your key is correct
+# - Restart the kernel if tools stop responding
+# - For timeouts, wait 1 minute and retry

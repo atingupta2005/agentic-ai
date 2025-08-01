@@ -1,0 +1,11 @@
+[Unit]
+Description=JupyterHub
+After=network.target
+
+[Service]
+User=root
+Environment="PATH=/opt/venvs/jupyterhub/venv_d0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+ExecStart=/opt/venvs/jupyterhub/venv_d0/bin/jupyterhub -f /etc/jupyterhub/jupyterhub_config_d0.py
+
+[Install]
+WantedBy=multi-user.target

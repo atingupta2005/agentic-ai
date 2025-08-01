@@ -1,0 +1,76 @@
+Atin Gupta – IT Consultant, Trainer & Solution Architect
+🔹 Professional Summary
+Atin Gupta is a seasoned IT professional with 24+ years of experience spanning Cloud Computing, Data Engineering, DevOps, AI/ML, and Blockchain. As a Microsoft Certified Trainer and a hands-on freelance consultant, he has delivered 140+ corporate trainings for top global MNCs and led end-to-end technical implementations across multiple domains.
+
+He brings deep multi-cloud expertise (Azure, AWS, GCP, Oracle), extensive hands-on experience with Big Data, Kubernetes, Terraform, Spark, Kafka, Neo4j, and Databricks, and proficiency in Python, R, PySpark, and MERN stack. Known for designing scalable, intelligent, and secure solutions, he also specializes in cutting-edge technologies like Generative AI, Retrieval-Augmented Generation (RAG), and LLMs (e.g., LLaMA models).
+
+🔹 Core Competencies
+Cloud & DevOps: Azure, AWS, GCP, OCI, Terraform, Jenkins, Docker, Kubernetes, Ansible, Helm, GitHub Actions, CircleCI
+
+AI/ML & GenAI: ChatGPT, LLaMA 2/3, RAG, MLOps, Hugging Face, Midjourney, DALL-E 3, NLP
+
+Data Engineering & Analytics: Databricks, PySpark, Kafka, Airflow, Apache NiFi, Azure Data Factory, Power BI, Tableau
+
+Blockchain: Ethereum, Hyperledger, Solidity, Corda
+
+Web Technologies: NodeJS, ReactJS, TypeScript, Django, Flask
+
+Databases: Neo4J, MongoDB, Cassandra, CosmosDB, SQL, MySQL
+
+SRE & Monitoring: Prometheus, Grafana, Azure Sentinel, ELK Stack
+
+🔹 Certifications
+Microsoft Azure: Certified in over 10 tracks including AI Engineer, Data Engineer, DevOps, Security, Administrator
+
+GCP: Associate Cloud Engineer, Professional Cloud Developer
+
+Databricks: Certified Data Engineer Associate
+
+Terraform: HashiCorp Certified Terraform Associate
+
+Blockchain (BTA/NPTEL): Blockchain Developer - Ethereum, Blockchain Architect
+
+NPTEL: Machine Learning, Deep Learning, Programming in Python, Blockchain Design
+
+🔹 Selected Projects
+Azure Cloud Setup for Swayam.gov.in – Architected and deployed the platform on Azure with Docker/Kubernetes and enhanced security
+
+BBNL Cloud Migration – Migrated Bharat Broadband Network from legacy infra to Azure
+
+Job Recommendation System – Built using Neo4J, Django, and Python with NLP for classification
+
+Predictive Healthcare Risk Analysis – Mortality prediction system with 87% accuracy using ML
+
+Blockchain Payment Gateway – Developed Bitcoin and Lightning Network payment integration
+
+Service Automation Platform – End-to-end automation for home appliance servicing using WhatsApp/SMS integrations
+
+🔹 Training Experience
+Delivered hundreds of technical trainings for top-tier companies such as Oracle, EY, TCS, Infosys, LTI, Capgemini, Microsoft, CGI, and IBM. Topics include:
+
+Generative AI, Prompt Engineering, LLMs
+
+Advanced Data Engineering with Databricks
+
+Azure AI, DevOps, Synapse, Purview
+
+Kafka, Spark, Terraform, Solace, Neo4J
+
+Machine Learning, Deep Learning, Python
+
+🔹 Education
+MCA, Sikkim Manipal University (2007)
+
+BCA, CCS University (2001)
+
+Diploma in System & Database Administration, CDAC Noida (2002)
+
+Multiple technical certifications from NPTEL, Microsoft, GCP, Databricks, BTA
+
+🔹 Contact & Links
+📧 Email: atingupta2005@gmail.com
+
+🌐 Portfolio: atingupta.in | Company Site
+
+🔗 LinkedIn: linkedin.com/in/profileatingupta
+
